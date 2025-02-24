@@ -15,7 +15,9 @@ st.write("Upload an image to detect the type of skin disease.")
 def download_and_load_model():
     model_path = "model.onnx"
     file_id = "1QkkAcXnK3sQW--yI8O-PmJsCQKP6BtRO"
-    download_url = f"https://drive.google.com/uc?id={1QkkAcXnK3sQW--yI8O-PmJsCQKP6BtRO}"
+    download_url = f"https://drive.google.com/uc?id={file_id}"
+
+   
 
     # Download if not already present
     if not os.path.exists(model_path):
