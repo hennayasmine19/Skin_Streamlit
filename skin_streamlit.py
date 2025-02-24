@@ -2,8 +2,8 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import onnxruntime as ort
-import requests  # For downloading the model from Google Drive
-import os  # To check if file already exists
+import gdown
+import os
 
 # Set up Streamlit page
 st.set_page_config(page_title="Skin Disease Detection", layout="centered")
@@ -11,31 +11,23 @@ st.title("Skin Disease Detection App")
 st.write("Upload an image to detect the type of skin disease.")
 
 # Function to download the model from Google Drive
-def download_model_from_gdrive(file_id, destination):
-    if not os.path.exists(destination):  # Download only if the file doesn't exist
-        download_url = f"https://drive.google.com/file/d/1QkkAcXnK3sQW--yI8O-PmJsCQKP6BtRO/view?usp=sharing"
-        response = requests.get(download_url)
-        if response.status_code == 200:
-            with open(destination, "wb") as f:
-                f.write(response.content)
-            print("Model downloaded successfully.")
-        else:
-            st.error("Failed to download the model from Google Drive.")
-    else:
-        print("Model already exists locally.")
-
-# Load ONNX Model
 @st.cache_resource
-def load_model():
-    file_id = "1QkkAcXnK3sQW--yI8O-PmJsCQKP6BtRO"  # Replace this with your actual Google Drive file ID
+def download_and_load_model():
     model_path = "model.onnx"
-    download_model_from_gdrive(file_id, model_path)  # Download at runtime
+    file_id = "1QkkAcXnK3sQW--yI8O-PmJsCQKP6BtRO"
+    download_url = f"https://drive.google.com/uc?id={1QkkAcXnK3sQW--yI8O-PmJsCQKP6BtRO}"
+
+    # Download if not already present
+    if not os.path.exists(model_path):
+        gdown.download(download_url, model_path, quiet=False)
+
+    # Load the ONNX model
     session = ort.InferenceSession(model_path)
     return session
 
-session = load_model()
+session = download_and_load_model()
 
-# Function to preprocess image
+# Function to preprocess the image
 def preprocess_image(image):
     image = image.resize((227, 227))  # Resize to 227x227
     img_array = np.array(image).astype('float32')
